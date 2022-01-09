@@ -2,61 +2,48 @@ package calculator
 
 class Calculator {
     val postfix = Postfix()
-
+    lateinit var key: String
+    lateinit var value: List<String>
     companion object {
-        val vars = mutableMapOf<String, String>()
+        val vars = mutableMapOf<String, Int>()
     }
 
     inner class Memory {
 
-        fun store(input: List<String>) {
-            val key = input.last()
-            val value = postfix.calcPostfix(input.subList(0, input.indexOf("="))).toString()
-            if (!passCheck(key, value)) return
-
-            if (value.matches("[\\d]+".toRegex())) {
-                vars[key] = value
-            } else if (vars.containsKey(value)) {
-                vars[key] = vars.getValue(value)
-            } else {
-                println("Unknown variable in store")
-            }
+        override fun toString(): String  {
+            return vars.toString()
         }
 
-        private fun passCheck(key: String, value: String): Boolean {
-            if (
-                key.contains("[\\d]".toRegex()) ||
-                key.contains("[\\W]".toRegex())
-            ) {
-                println("Invalid identifier")
-                return false
-            } else if (
-                value.contains("[a-zA-Z]+[\\d]+".toRegex()) ||
-                value.contains("[\\d]+[a-zA-Z]+".toRegex()) ||
-                value.contains("[\\W]".toRegex())
-            ) {
-                println("Invalid assignment")
-                return false
-            }
-            return true
+        fun store() {
+            value = restoreVariables(value)
+            value = postfix.convertToPostfix(value)
+            if(allIsFound(value)) vars[key] = postfix.calculate(value)
         }
 
-        fun findVariables(input: List<String>): List<String> {
+        fun restoreVariables(input: List<String>): List<String> {
             val output = input.toMutableList()
             for (i in output.indices) {
-                if (vars.containsKey(output[i])) {
-                    output[i] = vars.getValue(output[i])
+                val key = output[i]
+                if (vars.containsKey(key)) {
+                    output[i] = vars.getValue(output[i]).toString()
                 }
             }
             return output
         }
     }
 
-    fun allVarsIsFound(input: List<String>): Boolean {
+    fun allIsFound(input: List<String>): Boolean {
         input.forEach {
-            if (it.matches("[a-zA-Z]+".toRegex())) return false
+            if (it.matches("[a-zA-Z]+".toRegex()) && !vars.containsKey(it)) {
+                println("Unknown variable")
+                return false
+            }
         }
         return true
     }
 
+    fun getKeyValue(expression: String) {
+        key = expression.substringBefore("=")
+        value = postfix.convertToList(expression.substringAfter("="))
+    }
 }
