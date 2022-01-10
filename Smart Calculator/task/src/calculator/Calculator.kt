@@ -5,7 +5,7 @@ class Calculator {
     lateinit var key: String
     lateinit var value: List<String>
     companion object {
-        val vars = mutableMapOf<String, Int>()
+        val vars = mutableMapOf<String, String>()
     }
 
     inner class Memory {

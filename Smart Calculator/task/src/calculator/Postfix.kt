@@ -1,40 +1,44 @@
 package calculator
 
-class Postfix {
-    private fun add(x: Int, y: Int) = x + y
-    private fun subtract(x: Int, y: Int) = x - y
-    private fun multiply(x: Int, y: Int) = x * y
-    private fun divide(x: Int, y: Int) = x / y
-    private fun getPower(x: Int, y: Int): Int {
-        var result = x
-        repeat(y) { result *= x }
-        return result
-    }
+import java.lang.Exception
+import java.math.BigDecimal
 
-    private fun calculate(list: List<Int>, operator: (x: Int, y: Int) -> Int): Int {
+class Postfix {
+    private fun add(x: BigDecimal, y: BigDecimal) = (x + y)
+    private fun subtract(x: BigDecimal, y: BigDecimal) = (x - y)
+    private fun multiply(x: BigDecimal, y: BigDecimal) = (x * y)
+    private fun divide(x: BigDecimal, y: BigDecimal) = (x / y)
+    private fun getPower(x: BigDecimal, y: BigDecimal) = x.pow(y.toInt())
+
+    private fun calculate(list: List<BigDecimal>, operator: (x: BigDecimal, y: BigDecimal) -> BigDecimal): BigDecimal {
         return operator(list[list.lastIndex - 1], list.last())
     }
 
-    fun calculate(postfix: List<String>): Int {
-        val result = mutableListOf<Int>()
+    fun calculate(postfix: List<String>): String {
+        val result = mutableListOf<BigDecimal>()
 
         fun String.isNumber(): Boolean {
             return this.matches("[+-]?\\d+".toRegex())
         }
 
         for (element in postfix) {
-            val tmp = when (element) {
-                "+" -> calculate(result, ::add)
-                "-" -> calculate(result, ::subtract)
-                "/" -> calculate(result, ::divide)
-                "*" -> calculate(result, ::multiply)
-                "^" -> calculate(result, ::getPower)
-                else -> element.toInt()
+            var tmp: BigDecimal
+            try {
+                tmp = when (element) {
+                    "+" -> calculate(result, ::add)
+                    "-" -> calculate(result, ::subtract)
+                    "/" -> calculate(result, ::divide)
+                    "*" -> calculate(result, ::multiply)
+                    "^" -> calculate(result, ::getPower)
+                    else -> element.toBigDecimal()
+                }
+                if (!element.isNumber()) repeat(2) { result.removeAt(result.lastIndex) }
+                result.add(tmp)
+            } catch (e: Exception) {
+                return "Whoa! Something went wrong. Try again."
             }
-            if (!element.isNumber()) repeat(2) { result.removeAt(result.lastIndex) }
-            result.add(tmp)
         }
-        return result.first()
+        return result.first().toString()
     }
 
     fun convertToList(input: String): List<String> {
@@ -102,5 +106,5 @@ class Postfix {
         }
         return -1
     }
-    
+
 }
