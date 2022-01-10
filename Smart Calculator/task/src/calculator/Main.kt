@@ -14,10 +14,11 @@ fun main() {
                 println(
                     """
                 The program calculates sum and subtraction, multiplication, division,
-                power and unary minus.
+                power and unary minus for integer values.
                 Also supported storing of variables.
                 Just type operands and operates separated by space.
                 And so on.
+                Operations with floating point isn't supported.
                 Restriction: variable's name cannot contains digits.
                 Supported commands:
                     /help - show this manual
